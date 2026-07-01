@@ -1,6 +1,8 @@
-import { CalendarPlus } from 'lucide-react'
+import { differenceInCalendarDays, parseISO } from 'date-fns'
+import { useMemo, useState } from 'react'
+import { CalendarPlus, Droplets, Heart, Moon, Sparkles, Sun } from 'lucide-react'
 import type { AppSettings, PeriodRecord } from '../types'
-import { formatFriendlyDate } from '../lib/date'
+import { formatFriendlyDate, todayIsoDate } from '../lib/date'
 import { PeriodForm } from '../components/PeriodForm'
 
 type HomeScreenProps = {
@@ -10,21 +12,116 @@ type HomeScreenProps = {
   onAddRecord: (startDate: string, notes?: string) => Promise<void>
 }
 
+const comfortPicks = [
+  {
+    id: 'stretch',
+    label: 'Stretch',
+    detail: 'Try a slow shoulder roll and a gentle side stretch.',
+    icon: Sparkles,
+  },
+  {
+    id: 'water',
+    label: 'Water',
+    detail: 'Keep a water bottle nearby and sip before you feel thirsty.',
+    icon: Droplets,
+  },
+  {
+    id: 'rest',
+    label: 'Rest',
+    detail: 'Plan one quiet break today, even if it is only five minutes.',
+    icon: Moon,
+  },
+  {
+    id: 'warmth',
+    label: 'Warmth',
+    detail: 'A warm drink or cozy layer can make the day feel easier.',
+    icon: Sun,
+  },
+]
+
 export function HomeScreen({
   latestRecord,
   predictedNextStartDate,
   settings,
   onAddRecord,
 }: HomeScreenProps) {
+  const [selectedComfortId, setSelectedComfortId] = useState(comfortPicks[0].id)
+  const selectedComfort =
+    comfortPicks.find((item) => item.id === selectedComfortId) ?? comfortPicks[0]
+  const SelectedComfortIcon = selectedComfort.icon
+  const daysUntilEstimate = useMemo(() => {
+    if (!predictedNextStartDate) {
+      return undefined
+    }
+
+    return differenceInCalendarDays(
+      parseISO(predictedNextStartDate),
+      parseISO(todayIsoDate()),
+    )
+  }, [predictedNextStartDate])
+  const cycleProgress = useMemo(() => {
+    if (!latestRecord) {
+      return 0
+    }
+
+    const elapsed = differenceInCalendarDays(
+      parseISO(todayIsoDate()),
+      parseISO(latestRecord.startDate),
+    )
+    return Math.min(
+      100,
+      Math.max(0, Math.round((elapsed / settings.expectedCycleLengthInDays) * 100)),
+    )
+  }, [latestRecord, settings.expectedCycleLengthInDays])
+  const countdownLabel =
+    typeof daysUntilEstimate !== 'number'
+      ? 'Add a start date to begin'
+      : daysUntilEstimate > 1
+        ? `${daysUntilEstimate} days to go`
+        : daysUntilEstimate === 1
+          ? 'About 1 day to go'
+          : daysUntilEstimate === 0
+            ? 'Estimated for today'
+            : `${Math.abs(daysUntilEstimate)} days past estimate`
+
   return (
     <div className="screen-stack">
       <section className="hero-panel" aria-labelledby="home-title">
-        <p className="eyebrow">Private cycle tracking</p>
-        <h1 id="home-title">CycleKind</h1>
-        <p className="mt-3 text-base leading-7 text-stone-700">
-          Your next period may start around{' '}
-          <strong>{formatFriendlyDate(predictedNextStartDate)}</strong>.
-        </p>
+        <div className="hero-topline">
+          <p className="eyebrow">Private cycle tracking</p>
+          <span className="tiny-badge">
+            <Heart size={14} />
+            Just for you
+          </span>
+        </div>
+        <div className="hero-title-row">
+          <div>
+            <h1 id="home-title">CycleKind</h1>
+            <p className="mt-3 text-base leading-7 text-stone-700">
+              Your next period may start around{' '}
+              <strong>{formatFriendlyDate(predictedNextStartDate)}</strong>.
+            </p>
+          </div>
+          <div className="countdown-orb" aria-label={countdownLabel}>
+            <span>
+              {typeof daysUntilEstimate === 'number'
+                ? Math.abs(daysUntilEstimate)
+                : '--'}
+            </span>
+            <small>
+              {typeof daysUntilEstimate === 'number' && daysUntilEstimate < 0
+                ? 'past'
+                : 'days'}
+            </small>
+          </div>
+        </div>
+        <div
+          className="cycle-progress"
+          aria-label={`Cycle progress ${cycleProgress} percent`}
+        >
+          <span style={{ width: `${cycleProgress}%` }} />
+        </div>
+        <p className="mt-3 text-sm font-semibold text-rose-900">{countdownLabel}</p>
         <p className="mt-2 text-sm leading-6 text-stone-600">
           Estimated based on your selected cycle length. If your cycle starts
           earlier or later, record the actual start date and CycleKind will
@@ -62,6 +159,48 @@ export function HomeScreen({
           </div>
         </div>
         <PeriodForm onSubmit={onAddRecord} />
+      </section>
+
+      <section className="card" aria-labelledby="comfort-title">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="soft-icon mint-icon">
+            <SelectedComfortIcon size={20} />
+          </span>
+          <div>
+            <h2 id="comfort-title" className="section-title">
+              Pick a comfort quest
+            </h2>
+            <p className="text-sm text-stone-600">
+              Choose one small thing that could make today easier.
+            </p>
+          </div>
+        </div>
+        <div
+          className="comfort-grid"
+          role="list"
+          aria-label="Comfort quest choices"
+        >
+          {comfortPicks.map((pick) => {
+            const Icon = pick.icon
+            const isSelected = selectedComfortId === pick.id
+
+            return (
+              <button
+                key={pick.id}
+                className={isSelected ? 'comfort-chip selected' : 'comfort-chip'}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => setSelectedComfortId(pick.id)}
+              >
+                <Icon size={18} />
+                <span>{pick.label}</span>
+              </button>
+            )
+          })}
+        </div>
+        <p className="comfort-detail" role="status">
+          {selectedComfort.detail}
+        </p>
       </section>
 
       <p className="disclaimer">

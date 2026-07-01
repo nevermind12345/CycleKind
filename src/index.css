@@ -37,7 +37,10 @@ textarea:focus-visible {
 
 .app-shell {
   min-height: 100dvh;
-  background: linear-gradient(180deg, #fff1f5 0%, #ffdce8 48%, #fff7ef 100%);
+  background:
+    linear-gradient(135deg, rgba(190, 235, 219, 0.28) 0 12%, transparent 12% 100%),
+    linear-gradient(225deg, rgba(253, 230, 138, 0.28) 0 10%, transparent 10% 100%),
+    linear-gradient(180deg, #fff1f5 0%, #ffdce8 48%, #fff7ef 100%);
 }
 
 .screen-stack {
@@ -60,7 +63,21 @@ textarea:focus-visible {
 }
 
 .hero-panel {
+  position: relative;
+  overflow: hidden;
   padding: 1.5rem;
+}
+
+.hero-panel::after {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 5.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6ee7c8, #facc15, #ef5d8a);
+  content: "";
+  opacity: 0.52;
 }
 
 .hero-panel h1 {
@@ -70,6 +87,87 @@ textarea:focus-visible {
   font-weight: 750;
   letter-spacing: 0;
   line-height: 1;
+}
+
+.hero-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-topline,
+.hero-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hero-title-row {
+  margin-top: 0.35rem;
+}
+
+.tiny-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(38, 125, 112, 0.2);
+  border-radius: 999px;
+  background: #ecfdf7;
+  color: #1f766a;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.countdown-orb {
+  display: grid;
+  width: 5.2rem;
+  height: 5.2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  align-content: center;
+  border: 1px solid rgba(127, 36, 71, 0.18);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent 42%),
+    linear-gradient(135deg, #fde68a, #c7f9e5 58%, #ffd4e2);
+  color: #65203d;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 12px 26px rgba(76, 112, 95, 0.15);
+}
+
+.countdown-orb span {
+  font-size: 1.65rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.countdown-orb small {
+  color: #6f4f5a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.cycle-progress {
+  height: 0.7rem;
+  margin-top: 1.1rem;
+  overflow: hidden;
+  border: 1px solid rgba(127, 36, 71, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: inset 0 1px 2px rgba(142, 43, 73, 0.08);
+}
+
+.cycle-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #6ee7c8, #facc15 48%, #ef5d8a);
+  transition: width 360ms ease;
 }
 
 .card {
@@ -180,6 +278,27 @@ textarea:focus-visible {
   transform: translateY(1px);
 }
 
+.primary-button:not(:disabled):hover,
+.secondary-button:hover,
+.danger-button:hover,
+.icon-button:hover,
+.nav-button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button:not(:disabled):hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 14px 30px rgba(189, 39, 95, 0.3);
+}
+
+.secondary-button:hover,
+.icon-button:hover {
+  border-color: #d78fa9;
+  background: #fff5f9;
+  box-shadow: 0 8px 18px rgba(120, 58, 78, 0.12);
+}
+
 .soft-icon,
 .icon-button {
   display: inline-flex;
@@ -196,6 +315,13 @@ textarea:focus-visible {
     #ffd5e2;
   color: #a91f53;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.mint-icon {
+  background:
+    linear-gradient(180deg, #d7f8ea, #b7ecd8),
+    #d7f8ea;
+  color: #227267;
 }
 
 .icon-button {
@@ -235,6 +361,7 @@ textarea:focus-visible {
 }
 
 .calendar-day-button:hover {
+  transform: translateY(-1px) scale(1.03);
   filter: saturate(1.08);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.38),
@@ -351,6 +478,18 @@ textarea:focus-visible {
     #fff8fa;
   padding: 1rem;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+.record-row:hover {
+  border-color: #dba0b7;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 10px 22px rgba(120, 58, 78, 0.11);
+  transform: translateY(-1px);
 }
 
 .modal-backdrop {
@@ -388,10 +527,78 @@ textarea:focus-visible {
   border-radius: 0.85rem;
   background: #fff8fa;
   padding: 0.75rem 0.9rem;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
 }
 
 .radio-row input {
   accent-color: #c23568;
+}
+
+.radio-row:has(input:checked) {
+  border-color: #57b89e;
+  background: #f0fdf8;
+  box-shadow: inset 4px 0 0 #57b89e;
+}
+
+.radio-row:hover {
+  transform: translateY(-1px);
+}
+
+.comfort-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.comfort-chip {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 1px solid #e8bfd0;
+  border-radius: 0.9rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 246, 249, 0.86)),
+    #fff8fa;
+  color: #7a2446;
+  font-weight: 800;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+.comfort-chip:hover {
+  border-color: #81cfb8;
+  transform: translateY(-1px);
+  box-shadow: 0 9px 18px rgba(54, 120, 101, 0.12);
+}
+
+.comfort-chip.selected {
+  border-color: #57b89e;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent 48%),
+    #dcfce7;
+  color: #1f6f64;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.68),
+    0 10px 22px rgba(54, 120, 101, 0.13);
+}
+
+.comfort-detail {
+  margin-top: 0.9rem;
+  border: 1px solid rgba(87, 184, 158, 0.24);
+  border-radius: 0.85rem;
+  background: #f3fff9;
+  color: #315c55;
+  padding: 0.85rem 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.5;
 }
 
 .disclaimer {
@@ -440,6 +647,10 @@ textarea:focus-visible {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48);
 }
 
+.nav-button.active svg {
+  animation: nav-pop 420ms ease;
+}
+
 .app-alert,
 .app-status {
   margin-bottom: 1rem;
@@ -468,5 +679,41 @@ textarea:focus-visible {
   .hero-panel,
   .card {
     padding: 1.5rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-title-row {
+    display: grid;
+  }
+
+  .countdown-orb {
+    width: 4.8rem;
+    height: 4.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@keyframes nav-pop {
+  0% {
+    transform: scale(0.92);
+  }
+
+  58% {
+    transform: scale(1.12);
+  }
+
+  100% {
+    transform: scale(1);
   }
 }
