@@ -5,11 +5,13 @@ import { CalendarMonth } from '../components/CalendarMonth'
 
 type CalendarScreenProps = {
   records: PeriodRecord[]
+  expectedCycleLengthInDays: number
   predictedNextStartDate?: string
 }
 
 export function CalendarScreen({
   records,
+  expectedCycleLengthInDays,
   predictedNextStartDate,
 }: CalendarScreenProps) {
   const [month, setMonth] = useState(
@@ -21,6 +23,7 @@ export function CalendarScreen({
       <CalendarMonth
         month={month}
         records={records}
+        expectedCycleLengthInDays={expectedCycleLengthInDays}
         predictedNextStartDate={predictedNextStartDate}
         onMonthChange={setMonth}
       />

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import type { PeriodRecord } from '../types'
 import { PeriodForm } from '../components/PeriodForm'
@@ -22,22 +22,52 @@ export function RecordsScreen({
     [records],
   )
 
+  useEffect(() => {
+    if (!editingRecord) {
+      return
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setEditingRecord(undefined)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [editingRecord])
+
   return (
     <div className="screen-stack">
       {editingRecord ? (
-        <section className="card" aria-labelledby="edit-record-title">
-          <h2 id="edit-record-title" className="section-title mb-4">
-            Edit record
-          </h2>
-          <PeriodForm
-            record={editingRecord}
-            onCancel={() => setEditingRecord(undefined)}
-            onSubmit={async (startDate, notes) => {
-              await onUpdateRecord(editingRecord.id, startDate, notes)
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
               setEditingRecord(undefined)
-            }}
-          />
-        </section>
+            }
+          }}
+        >
+          <section
+            className="modal-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-record-title"
+          >
+            <h2 id="edit-record-title" className="section-title mb-4">
+              Edit record
+            </h2>
+            <PeriodForm
+              record={editingRecord}
+              onCancel={() => setEditingRecord(undefined)}
+              onSubmit={async (startDate, notes) => {
+                await onUpdateRecord(editingRecord.id, startDate, notes)
+                setEditingRecord(undefined)
+              }}
+            />
+          </section>
+        </div>
       ) : null}
 
       <section className="card" aria-labelledby="records-title">

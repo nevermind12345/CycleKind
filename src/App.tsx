@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { CalendarDays, Home, List, Settings } from 'lucide-react'
 import { useCycleData } from './hooks/useCycleData'
 import { HomeScreen } from './screens/HomeScreen'
@@ -21,7 +21,17 @@ const navigation: Array<{
 
 function App() {
   const [screen, setScreen] = useState<Screen>('home')
+  const [statusMessage, setStatusMessage] = useState<string>()
   const cycleData = useCycleData()
+
+  const runWithStatus = useCallback(
+    async (mutation: () => Promise<void>, message: string) => {
+      setStatusMessage(undefined)
+      await mutation()
+      setStatusMessage(message)
+    },
+    [],
+  )
 
   const activeScreen = useMemo(() => {
     if (!cycleData.settings) {
@@ -35,13 +45,19 @@ function App() {
             latestRecord={cycleData.latestRecord}
             predictedNextStartDate={cycleData.predictedNextStartDate}
             settings={cycleData.settings}
-            onAddRecord={cycleData.addPeriodRecord}
+            onAddRecord={(startDate, notes) =>
+              runWithStatus(
+                () => cycleData.addPeriodRecord(startDate, notes),
+                'Period start date added.',
+              )
+            }
           />
         )
       case 'calendar':
         return (
           <CalendarScreen
             records={cycleData.records}
+            expectedCycleLengthInDays={cycleData.settings.expectedCycleLengthInDays}
             predictedNextStartDate={cycleData.predictedNextStartDate}
           />
         )
@@ -49,8 +65,18 @@ function App() {
         return (
           <RecordsScreen
             records={cycleData.records}
-            onUpdateRecord={cycleData.updatePeriodRecord}
-            onDeleteRecord={cycleData.deletePeriodRecord}
+            onUpdateRecord={(id, startDate, notes) =>
+              runWithStatus(
+                () => cycleData.updatePeriodRecord(id, startDate, notes),
+                'Period record updated.',
+              )
+            }
+            onDeleteRecord={(id) =>
+              runWithStatus(
+                () => cycleData.deletePeriodRecord(id),
+                'Period record deleted.',
+              )
+            }
           />
         )
       case 'settings':
@@ -65,17 +91,25 @@ function App() {
           />
         )
     }
-  }, [cycleData, screen])
+  }, [cycleData, runWithStatus, screen])
 
   return (
     <div className="app-shell">
       <main className="mx-auto min-h-dvh w-full max-w-xl px-4 pb-28 pt-5">
         {cycleData.error ? (
           <div
-            className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900"
+            className="app-alert"
             role="alert"
           >
             {cycleData.error}
+          </div>
+        ) : null}
+        {statusMessage ? (
+          <div
+            className="app-status"
+            role="status"
+          >
+            {statusMessage}
           </div>
         ) : null}
         {cycleData.isLoading || !cycleData.settings ? (
