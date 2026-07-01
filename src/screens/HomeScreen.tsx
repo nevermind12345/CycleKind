@@ -4,6 +4,7 @@ import { CalendarPlus, Droplets, Heart, Moon, Sparkles, Sun } from 'lucide-react
 import type { AppSettings, PeriodRecord } from '../types'
 import { formatFriendlyDate, todayIsoDate } from '../lib/date'
 import { PeriodForm } from '../components/PeriodForm'
+import mascotImage from '../assets/cyclekind-cat-mascot.png'
 
 type HomeScreenProps = {
   latestRecord?: PeriodRecord
@@ -39,6 +40,13 @@ const comfortPicks = [
   },
 ]
 
+const mascotMessages = [
+  'Tiny paws, tiny steps, still counts.',
+  'Your cozy cat says soft day mode is allowed.',
+  'Sip some water and be gentle with yourself.',
+  'A flower for you, because you are doing enough.',
+]
+
 export function HomeScreen({
   latestRecord,
   predictedNextStartDate,
@@ -46,6 +54,7 @@ export function HomeScreen({
   onAddRecord,
 }: HomeScreenProps) {
   const [selectedComfortId, setSelectedComfortId] = useState(comfortPicks[0].id)
+  const [mascotMessageIndex, setMascotMessageIndex] = useState(0)
   const selectedComfort =
     comfortPicks.find((item) => item.id === selectedComfortId) ?? comfortPicks[0]
   const SelectedComfortIcon = selectedComfort.icon
@@ -113,6 +122,29 @@ export function HomeScreen({
                 ? 'past'
                 : 'days'}
             </small>
+          </div>
+        </div>
+        <div className="mascot-row">
+          <button
+            className="mascot-button"
+            type="button"
+            aria-label="Tap cat mascot for a gentle note"
+            onClick={() =>
+              setMascotMessageIndex(
+                (current) => (current + 1) % mascotMessages.length,
+              )
+            }
+          >
+            <img
+              src={mascotImage}
+              alt=""
+              aria-hidden="true"
+              draggable={false}
+            />
+          </button>
+          <div className="mascot-note" role="status">
+            <span>Cat note</span>
+            <strong>{mascotMessages[mascotMessageIndex]}</strong>
           </div>
         </div>
         <div
